@@ -1,0 +1,140 @@
+---
+name: I_EWM_AVAILABLESTOCK
+description: Ewm Availablestock
+app_component: SCM-EWM-WOP-2CL
+software_component: SAPSCORE
+release_state: released
+clean_core_level: A
+system_type: public_cloud
+source_available: true
+tags:
+  - SCM
+  - SCM-EWM
+  - SCM-EWM-WOP
+  - interface-view
+  - component:SCM-EWM-WOP-2CL
+  - lob:Other
+---
+# I_EWM_AVAILABLESTOCK
+
+**Ewm Availablestock**
+
+| Property | Value |
+|---|---|
+| App Component | `SCM-EWM-WOP-2CL` |
+| Software Component | `SAPSCORE` |
+| Release State | Released (Level A) |
+| System Type | S/4HANA Cloud Public Edition |
+
+## Fields
+
+| Field | Data Source |
+|---|---|
+| `ParentHandlingUnitUUID` | `guid_parent` |
+| `StockItemUUID` | `guid_stock` |
+| `EWMWarehouse` | `lgnum` |
+| `raw16 preserving type)` | `cast(matid` |
+| `StockDocumentCategory` | `stock_doccat` |
+| `StockDocumentNumber` | `stock_docno` |
+| `StockItemNumber` | `stock_itmno` |
+| `StockSegment` | `stk_seg_long` |
+| `CounterForStockSeparation` | `stock_cnt` |
+| `EWMDocumentCategory` | `doccat` |
+| `BatchUUID` | `batchid` |
+| `Batch` | `charg` |
+| `EWMBatchIsInRestrictedUseStock` | `brestr` |
+| `CountryOfOrigin` | `coo` |
+| `EWMStockType` | `cat` |
+| `ewm_de_huident preserving type)` | `cast(huident` |
+| `HandlingUnitOpenTaskInd` | `flgmove` |
+| `HandlingUnitLogicalPosition` | `logpos` |
+| `EWMStorageType` | `lgtyp` |
+| `EWMStorageBin` | `lgpla` |
+| `EWMResource` | `rsrc` |
+| `ewm_de_stockowner preserving type )` | `cast( owner` |
+| `StockOwnerPartnerRole` | `owner_role` |
+| `EntitledToDisposeParty` | `entitled` |
+| `EntitledToDisposePartnerRole` | `entitled_role` |
+| `EWMStockUsage` | `stock_usage` |
+| `AvailableEWMStockQty` | `quan` |
+| `EWMStockQuantityBaseUnit` | `unit` |
+| `StockKeepingAlternativeUoM` | `altme` |
+| `/scwm/lvs_wdatu_noconv preserving type )` | `cast ( wdatu` |
+| `ShelfLifeExpirationDate` | `vfdat` |
+| `EWMStockIsBlockedForInventory` | `skzsi` |
+| `TranspUnitInternalNumber` | `tu_num` |
+| `WhseQualityInspectionType` | `insptyp` |
+| `QualityInspectionDocUUID` | `inspid` |
+| `EWMStorageBinImprovable` | `outcon` |
+| `EWMQuantityIsRead` | `read_quants` |
+
+## Associations
+
+> No associations found.
+
+## Source Code
+
+```abap
+@AbapCatalog.viewEnhancementCategory: [#NONE]
+@AccessControl.authorizationCheck: #CHECK
+@EndUserText.label: 'Available Stock'
+@Metadata.ignorePropagatedAnnotations: true
+
+@VDM.viewType: #BASIC
+@VDM.lifecycle.contract.type: #PUBLIC_LOCAL_API
+
+@ObjectModel.usageType.serviceQuality: #A
+@ObjectModel.usageType.dataClass:      #TRANSACTIONAL
+@ObjectModel.usageType.sizeCategory:   #L
+@ObjectModel.supportedCapabilities: [ #CDS_MODELING_DATA_SOURCE,
+                                      #CDS_MODELING_ASSOCIATION_TARGET,
+                                      #SQL_DATA_SOURCE,
+                                      #SEARCHABLE_ENTITY ]
+define view entity I_EWM_AvailableStock
+  as select from /scwm/aqua
+{
+  key guid_parent                                              as ParentHandlingUnitUUID,
+  key guid_stock                                               as StockItemUUID,
+      lgnum                                                    as EWMWarehouse,
+      @EndUserText.label: 'Product UUID'
+      cast(matid as raw16 preserving type)                     as ProductUUID,
+      stock_doccat                                             as StockDocumentCategory,
+      stock_docno                                              as StockDocumentNumber,
+      stock_itmno                                              as StockItemNumber,
+//    StockSegment is not supported in the cloud
+      @Feature: 'SW:/SCWM/SFWS_104_ON_PREMISE'      
+      stk_seg_long                                             as StockSegment,
+      stock_cnt                                                as CounterForStockSeparation,
+      doccat                                                   as EWMDocumentCategory,
+      batchid                                                  as BatchUUID,
+      charg                                                    as Batch,
+      brestr                                                   as EWMBatchIsInRestrictedUseStock,
+      coo                                                      as CountryOfOrigin,
+      cat                                                      as EWMStockType,
+      cast(huident as ewm_de_huident preserving type)          as HandlingUnitNumber,
+      flgmove                                                  as HandlingUnitOpenTaskInd,
+      logpos                                                   as HandlingUnitLogicalPosition,
+      lgtyp                                                    as EWMStorageType,
+      lgpla                                                    as EWMStorageBin,
+      rsrc                                                     as EWMResource,
+      cast( owner  as ewm_de_stockowner preserving type )      as EWMStockOwner,
+      owner_role                                               as StockOwnerPartnerRole,
+      entitled                                                 as EntitledToDisposeParty,
+      entitled_role                                            as EntitledToDisposePartnerRole,
+      stock_usage                                              as EWMStockUsage,
+      @Semantics.quantity.unitOfMeasure: 'EWMSTOCKQUANTITYBASEUNIT'
+      quan                                                     as AvailableEWMStockQty,
+      unit                                                     as EWMStockQuantityBaseUnit,
+      altme                                                    as StockKeepingAlternativeUoM,
+      cast ( wdatu as /scwm/lvs_wdatu_noconv preserving type ) as GoodsReceiptUTCDateTime,
+      vfdat                                                    as ShelfLifeExpirationDate,
+      skzsi                                                    as EWMStockIsBlockedForInventory,
+//    TranspUnitInternalNumber is not supported in the cloud
+      @Feature: 'SW:/SCWM/SFWS_104_ON_PREMISE'
+      tu_num                                                   as TranspUnitInternalNumber,
+      insptyp                                                  as WhseQualityInspectionType,
+      inspid                                                   as QualityInspectionDocUUID,
+      outcon                                                   as EWMStorageBinImprovable,  
+      read_quants                                              as EWMQuantityIsRead            
+}
+```

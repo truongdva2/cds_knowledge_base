@@ -1,0 +1,86 @@
+---
+name: I_TAXBASEBALANCESGROUP
+description: Taxbasebalancesgroup
+app_component: FI-LOC-VAT-GEN
+software_component: SAPSCORE
+release_state: released
+clean_core_level: A
+system_type: public_cloud
+source_available: true
+tags:
+  - FI
+  - FI-LOC
+  - FI-LOC-VAT
+  - interface-view
+  - tax
+  - component:FI-LOC-VAT-GEN
+  - lob:Finance
+---
+# I_TAXBASEBALANCESGROUP
+
+**Taxbasebalancesgroup**
+
+| Property | Value |
+|---|---|
+| App Component | `FI-LOC-VAT-GEN` |
+| Software Component | `SAPSCORE` |
+| Release State | Released (Level A) |
+| System Type | S/4HANA Cloud Public Edition |
+
+## Fields
+
+| Field | Data Source |
+|---|---|
+| `land1_gp)` | `cast(t007k.land1` |
+| `TaxItemGroupingVersion` | `t007k.version` |
+| `fis_mwskz)` | `cast(t007k.mwskz` |
+| `fac_ktosl)` | `cast(t007k.ktosl` |
+| `fis_shkzg)` | `cast(t007k.shkzg_umsv` |
+| `fis_taxbasbalgrp)` | `cast(t007k.basgruno` |
+| `txgrpgopera)` | `cast(t007k.opera` |
+| `case opera` | `case opera` |
+| `when '-'` | `when '-'` |
+| `oper_type preserving type )` | `then cast ( 'X'` |
+| `oper_type preserving type )` | `else cast (''` |
+| `HasNegativeSign` | `end` |
+
+## Associations
+
+> No associations found.
+
+## Source Code
+
+```abap
+@AbapCatalog.sqlViewName: 'ITAXBASEBALGRP'
+@VDM.viewType: #BASIC
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@ClientHandling.algorithm: #SESSION_VARIABLE
+@ObjectModel.usageType.sizeCategory: #M
+@ObjectModel.usageType.serviceQuality: #B
+@ObjectModel.usageType.dataClass: #CUSTOMIZING
+@AbapCatalog.preserveKey:true
+@AbapCatalog.compiler.compareFilter:true
+@Metadata.ignorePropagatedAnnotations: true
+@EndUserText.label: 'Grouping Numbers of Tax Base Balances'
+@ObjectModel.supportedCapabilities: 
+   [ #SQL_DATA_SOURCE, #CDS_MODELING_DATA_SOURCE ]
+@VDM.lifecycle.contract.type: #PUBLIC_LOCAL_API
+define view I_TaxBaseBalancesGroup
+  as select from t007k
+{
+  key cast(t007k.land1 as land1_gp)              as  Country,
+  key t007k.version                              as  TaxItemGroupingVersion,
+  key cast(t007k.mwskz as fis_mwskz)             as  TaxCode,
+  key cast(t007k.ktosl as fac_ktosl)             as  TransactionTypeDetermination,
+  key cast(t007k.shkzg_umsv as fis_shkzg)        as  DebitCreditCode,
+  key cast(t007k.basgruno as fis_taxbasbalgrp)   as  TaxBaseAmountGroupNumber,
+      cast(t007k.opera as txgrpgopera)           as  TaxGroupOperation,
+      @Semantics.booleanIndicator: true
+      case opera
+      when '-'
+      then cast ( 'X' as oper_type preserving type ) 
+      else cast ('' as oper_type preserving type ) 
+      end                                        as  HasNegativeSign
+      
+}
+```

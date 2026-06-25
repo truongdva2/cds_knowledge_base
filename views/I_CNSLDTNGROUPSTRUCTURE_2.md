@@ -1,0 +1,169 @@
+---
+name: I_CNSLDTNGROUPSTRUCTURE_2
+description: Cnsldtngroupstructure 2
+app_component: FIN-CS-MD-2CL
+software_component: SAPSCORE
+release_state: released
+clean_core_level: A
+system_type: public_cloud
+source_available: true
+tags:
+  - FIN
+  - FIN-CS
+  - FIN-CS-MD
+  - interface-view
+  - component:FIN-CS-MD-2CL
+  - lob:Other
+---
+# I_CNSLDTNGROUPSTRUCTURE_2
+
+**Cnsldtngroupstructure 2**
+
+| Property | Value |
+|---|---|
+| App Component | `FIN-CS-MD-2CL` |
+| Software Component | `SAPSCORE` |
+| Release State | Released (Level A) |
+| System Type | S/4HANA Cloud Public Edition |
+
+## Fields
+
+| Field | Data Source |
+|---|---|
+| `name: 'I_CnsldtnVersionVH'` | `name: 'I_CnsldtnVersionVH'` |
+| `element: 'ConsolidationVersion'` | `element: 'ConsolidationVersion'` |
+| `}` | `}` |
+| `}]` | `}]` |
+| `key _Source.ConsolidationVersion` | `_Source.ConsolidationVersion` |
+| `fincs_fromfiscalyearperiod preserving type )` | `cast( _Source.GroupStrucFromFiscalYearPeriod` |
+| `fincs_tofiscalyearperiod preserving type )` | `cast( _Source.GroupStrucToFiscalYearPeriod` |
+| `_Source.YearOfFirstConsolidation` | *Association* |
+| `_Source.PeriodOfFirstConsolidation` | *Association* |
+| `_Source.FirstCnsldtnIsAtEndOfPeriod` | *Association* |
+| `_Source.YearOfDivestiture` | *Association* |
+| `_Source.PeriodOfDivestiture` | *Association* |
+| `_Source.DivestitureIsAtBeginOfPeriod` | *Association* |
+| `_Source.ConsolidationMethod, // no longer valid` | *Association* |
+| `_Source.AccountingTechnique, // no longer valid` | *Association* |
+| `_Source.DivestitureIsDueToMerger` | *Association* |
+| `_Source.ETag` | *Association* |
+| `/* Associations */` | `/* Associations */` |
+| `_CnsldtnVersion` | *Association* |
+| `_CnsldtnGroup` | *Association* |
+| `_CnsldtnUnit` | *Association* |
+
+## Associations
+
+> No associations found.
+
+## Source Code
+
+```abap
+@AbapCatalog:{
+  sqlViewName: 'ICSGRPSTR2',
+  compiler.compareFilter: true
+}
+@Analytics: {
+  dataExtraction.enabled: true
+}
+@AccessControl.authorizationCheck: #MANDATORY
+@ClientHandling.algorithm: #SESSION_VARIABLE
+@Metadata:{
+  ignorePropagatedAnnotations: true
+}
+@ObjectModel:{
+  usageType: {
+    dataClass: #MASTER,
+    serviceQuality: #B,
+    sizeCategory: #S
+  },
+  modelingPattern: #NONE,
+  supportedCapabilities: [#CDS_MODELING_DATA_SOURCE,
+                          #CDS_MODELING_ASSOCIATION_TARGET,
+                          #EXTRACTION_DATA_SOURCE,
+                          #SQL_DATA_SOURCE ],
+  sapObjectNodeType.name: 'ConsolidationGroupStructure'
+}
+@Search.searchable: true
+@VDM.viewType: #BASIC
+@EndUserText.label: 'Consolidation Group Structure'
+
+define view I_CnsldtnGroupStructure_2
+  as select from P_CnsldtnGroupStructure as _Source
+
+{
+      @ObjectModel: {
+        foreignKey.association: '_CnsldtnGroup',
+        sapObjectNodeTypeReference: 'ConsolidationGroup' }
+      @Search:{
+        defaultSearchElement: true,
+        ranking: #HIGH,
+        fuzzinessThreshold: 0.8
+      }
+      @Consumption.valueHelpDefinition: [{
+        entity:{
+          name: 'I_CnsldtnGroupVH',
+          element: 'ConsolidationGroup'
+        }
+      }]
+  key _Source.ConsolidationGroup,
+
+      @ObjectModel:{
+        foreignKey.association: '_CnsldtnUnit',
+        sapObjectNodeTypeReference: 'ConsolidationUnit' }
+      @Search:{
+        defaultSearchElement: true,
+        ranking: #HIGH,
+        fuzzinessThreshold: 0.8
+      }
+      @Consumption.valueHelpDefinition: [{
+        entity:{
+          name: 'I_CnsldtnUnitVH',
+          element: 'ConsolidationUnit'
+        }
+      }]
+  key _Source.ConsolidationUnit,
+
+      @ObjectModel: {
+        foreignKey.association: '_CnsldtnVersion',
+        sapObjectNodeTypeReference: 'ConsolidationVersion' }
+      @Search:{
+        defaultSearchElement: true,
+        ranking: #MEDIUM,
+        fuzzinessThreshold: 0.8
+      }
+      @Consumption.valueHelpDefinition: [{
+        entity:{
+          name: 'I_CnsldtnVersionVH',
+          element: 'ConsolidationVersion'
+        }
+      }]
+  key _Source.ConsolidationVersion,
+
+      @Semantics.fiscal.yearPeriod: true
+  key cast( _Source.GroupStrucFromFiscalYearPeriod as fincs_fromfiscalyearperiod preserving type ) as FromFiscalYearPeriod,
+
+      @Semantics.fiscal.yearPeriod: true
+      cast( _Source.GroupStrucToFiscalYearPeriod as fincs_tofiscalyearperiod preserving type )     as ToFiscalYearPeriod,
+
+      _Source.YearOfFirstConsolidation,
+      _Source.PeriodOfFirstConsolidation,
+      _Source.FirstCnsldtnIsAtEndOfPeriod,
+      _Source.YearOfDivestiture,
+      _Source.PeriodOfDivestiture,
+      _Source.DivestitureIsAtBeginOfPeriod,
+      _Source.ConsolidationMethod, // no longer valid  
+      _Source.AccountingTechnique, // no longer valid  
+
+      _Source.DivestitureIsDueToMerger,
+
+      @UI.hidden: true
+      _Source.ETag,
+
+
+      /* Associations */
+      _CnsldtnVersion,
+      _CnsldtnGroup,
+      _CnsldtnUnit
+}
+```

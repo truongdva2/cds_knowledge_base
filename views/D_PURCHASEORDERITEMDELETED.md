@@ -1,0 +1,65 @@
+---
+name: D_PURCHASEORDERITEMDELETED
+description: D Purchase OrderITEMDELETED
+app_component: MM-PUR-PO-2CL
+software_component: SAPSCORE
+release_state: released
+clean_core_level: A
+system_type: public_cloud
+source_available: true
+tags:
+  - MM
+  - MM-PUR
+  - MM-PUR-PO
+  - purchase-order
+  - item-level
+  - component:MM-PUR-PO-2CL
+  - lob:Sourcing & Procurement
+  - bo:PurchaseOrder
+---
+# D_PURCHASEORDERITEMDELETED
+
+**D Purchase OrderITEMDELETED**
+
+| Property | Value |
+|---|---|
+| App Component | `MM-PUR-PO-2CL` |
+| Software Component | `SAPSCORE` |
+| Release State | Released (Level A) |
+| System Type | S/4HANA Cloud Public Edition |
+
+## Fields
+
+| Field | Data Source |
+|---|---|
+| `PurchaseOrderType : bsart;` | `PurchaseOrderType : bsart;` |
+| `PurchasingOrganization : ekorg;` | `PurchasingOrganization : ekorg;` |
+| `PurchasingGroup : ekgrp;` | `PurchasingGroup : ekgrp;` |
+| `Supplier : lifnr;` | `Supplier : lifnr;` |
+| `PurchaseOrderItemCategory : pstyp;` | `PurchaseOrderItemCategory : pstyp;` |
+| `Plant : vdm_werks_d;` | `Plant : vdm_werks_d;` |
+| `Product : matnr;` | `Product : matnr;` |
+
+## Associations
+
+> No associations found.
+
+## Source Code
+
+```abap
+@EndUserText.label: 'Purchase Order Item Deleted'
+@VDM.usage.type: [#EVENT_SIGNATURE]
+@ObjectModel.supportedCapabilities: [#DATA_STRUCTURE]
+
+define abstract entity D_PurchaseOrderItemDeleted
+{
+    PurchaseOrderType : bsart;
+    PurchasingOrganization : ekorg;
+    PurchasingGroup : ekgrp;
+    Supplier : lifnr;
+    PurchaseOrderItemCategory : pstyp;
+    Plant : vdm_werks_d;
+    Product : matnr;
+    
+}
+```

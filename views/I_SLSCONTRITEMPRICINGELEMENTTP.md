@@ -1,0 +1,147 @@
+---
+name: I_SLSCONTRITEMPRICINGELEMENTTP
+description: Slscontritempricingelementtp
+app_component: SD-SLS-OA-2CL
+software_component: SAPSCORE
+release_state: released
+clean_core_level: A
+system_type: public_cloud
+source_available: true
+tags:
+  - SD
+  - SD-SLS
+  - SD-SLS-OA
+  - interface-view
+  - transactional-processing
+  - pricing
+  - item-level
+  - component:SD-SLS-OA-2CL
+  - lob:Sales & Distribution
+---
+# I_SLSCONTRITEMPRICINGELEMENTTP
+
+**Slscontritempricingelementtp**
+
+| Property | Value |
+|---|---|
+| App Component | `SD-SLS-OA-2CL` |
+| Software Component | `SAPSCORE` |
+| Release State | Released (Level A) |
+| System Type | S/4HANA Cloud Public Edition |
+
+## Fields
+
+| Field | Data Source |
+|---|---|
+| `key SalesContractItemPrcgElmnt.SalesContract` | `SalesContractItemPrcgElmnt.SalesContract` |
+| `key SalesContractItemPrcgElmnt.SalesContractItem` | `SalesContractItemPrcgElmnt.SalesContractItem` |
+| `key SalesContractItemPrcgElmnt.PricingProcedureStep` | `SalesContractItemPrcgElmnt.PricingProcedureStep` |
+| `key SalesContractItemPrcgElmnt.PricingProcedureCounter` | `SalesContractItemPrcgElmnt.PricingProcedureCounter` |
+| `SalesContractItemPrcgElmnt.ConditionApplication` | `SalesContractItemPrcgElmnt.ConditionApplication` |
+| `SalesContractItemPrcgElmnt.ConditionType` | `SalesContractItemPrcgElmnt.ConditionType` |
+| `SalesContractItemPrcgElmnt.ConditionCalculationType` | `SalesContractItemPrcgElmnt.ConditionCalculationType` |
+| `SalesContractItemPrcgElmnt.ConditionRateAmount` | `SalesContractItemPrcgElmnt.ConditionRateAmount` |
+| `SalesContractItemPrcgElmnt.ConditionCurrency` | `SalesContractItemPrcgElmnt.ConditionCurrency` |
+| `SalesContractItemPrcgElmnt.ConditionRateRatio` | `SalesContractItemPrcgElmnt.ConditionRateRatio` |
+| `SalesContractItemPrcgElmnt.ConditionRateRatioUnit` | `SalesContractItemPrcgElmnt.ConditionRateRatioUnit` |
+| `SalesContractItemPrcgElmnt.ConditionBaseAmount` | `SalesContractItemPrcgElmnt.ConditionBaseAmount` |
+| `SalesContractItemPrcgElmnt.ConditionAmount` | `SalesContractItemPrcgElmnt.ConditionAmount` |
+| `SalesContractItemPrcgElmnt.TransactionCurrency` | `SalesContractItemPrcgElmnt.TransactionCurrency` |
+| `SalesContractItemPrcgElmnt.ConditionBaseQuantity` | `SalesContractItemPrcgElmnt.ConditionBaseQuantity` |
+| `SalesContractItemPrcgElmnt.ConditionQuantity` | `SalesContractItemPrcgElmnt.ConditionQuantity` |
+| `SalesContractItemPrcgElmnt.ConditionQuantityUnit` | `SalesContractItemPrcgElmnt.ConditionQuantityUnit` |
+| `SalesContractItemPrcgElmnt.ConditionIsForStatistics` | `SalesContractItemPrcgElmnt.ConditionIsForStatistics` |
+| `SalesContractItemPrcgElmnt.ConditionIsManuallyChanged` | `SalesContractItemPrcgElmnt.ConditionIsManuallyChanged` |
+| `SalesContractItemPrcgElmnt.ConditionInactiveReason` | `SalesContractItemPrcgElmnt.ConditionInactiveReason` |
+| `SalesContractItemPrcgElmnt.SalesContractType` | `SalesContractItemPrcgElmnt.SalesContractType` |
+| `SalesContractItemPrcgElmnt.SalesOrganization` | `SalesContractItemPrcgElmnt.SalesOrganization` |
+| `SalesContractItemPrcgElmnt.DistributionChannel` | `SalesContractItemPrcgElmnt.DistributionChannel` |
+| `SalesContractItemPrcgElmnt.OrganizationDivision` | `SalesContractItemPrcgElmnt.OrganizationDivision` |
+| `_Item          : redirected to parent I_SalesContractItemTP` | *Association* |
+| `_SalesContract : redirected to I_SalesContractTP` | *Association* |
+
+## Associations
+
+> No associations found.
+
+## Source Code
+
+```abap
+@EndUserText.label: 'Sales Contract Item Pricing Element - TP'
+
+@AccessControl.authorizationCheck: #CHECK
+@AccessControl.personalData.blocking: #('TRANSACTIONAL_DATA')
+
+@Metadata.ignorePropagatedAnnotations: true
+
+@ObjectModel: {
+   modelingPattern:        #TRANSACTIONAL_INTERFACE,
+   supportedCapabilities: [#TRANSACTIONAL_PROVIDER],
+   usageType: {
+     serviceQuality: #C,
+     sizeCategory:   #XL,
+     dataClass:      #TRANSACTIONAL
+   },
+   semanticKey: ['SalesContract', 'SalesContractItem', 'PricingProcedureStep', 'PricingProcedureCounter']
+ }
+
+@VDM: {
+  lifecycle.contract.type: #PUBLIC_LOCAL_API,
+  viewType: #TRANSACTIONAL
+}
+define view entity I_SlsContrItemPricingElementTP
+  as projection on R_SlsContrItemPricingElementTP as SalesContractItemPrcgElmnt
+{
+  key SalesContractItemPrcgElmnt.SalesContract,
+  key SalesContractItemPrcgElmnt.SalesContractItem,
+  key SalesContractItemPrcgElmnt.PricingProcedureStep,
+  key SalesContractItemPrcgElmnt.PricingProcedureCounter,
+
+      SalesContractItemPrcgElmnt.ConditionApplication,
+      SalesContractItemPrcgElmnt.ConditionType,
+      SalesContractItemPrcgElmnt.ConditionCalculationType,
+
+      @Semantics.amount.currencyCode: 'ConditionCurrency'
+      @OData.v2.amount.noDecimalShift: true
+      SalesContractItemPrcgElmnt.ConditionRateAmount,
+      SalesContractItemPrcgElmnt.ConditionCurrency,
+
+      @Semantics.quantity.unitOfMeasure: 'ConditionRateRatioUnit'
+      SalesContractItemPrcgElmnt.ConditionRateRatio,
+      SalesContractItemPrcgElmnt.ConditionRateRatioUnit,
+
+      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @OData.v2.amount.noDecimalShift: true
+      SalesContractItemPrcgElmnt.ConditionBaseAmount,
+
+      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      SalesContractItemPrcgElmnt.ConditionAmount,
+      SalesContractItemPrcgElmnt.TransactionCurrency,
+
+      @Semantics.quantity.unitOfMeasure: 'ConditionQuantityUnit'
+      SalesContractItemPrcgElmnt.ConditionBaseQuantity,
+
+      @Semantics.quantity.unitOfMeasure: 'ConditionQuantityUnit'
+      SalesContractItemPrcgElmnt.ConditionQuantity,
+      SalesContractItemPrcgElmnt.ConditionQuantityUnit,
+
+      SalesContractItemPrcgElmnt.ConditionIsForStatistics,
+      SalesContractItemPrcgElmnt.ConditionIsManuallyChanged,
+      SalesContractItemPrcgElmnt.ConditionInactiveReason,
+
+      //for DCL
+      @Consumption.hidden: true
+      SalesContractItemPrcgElmnt.SalesContractType,
+      @Consumption.hidden: true
+      SalesContractItemPrcgElmnt.SalesOrganization,
+      @Consumption.hidden: true
+      SalesContractItemPrcgElmnt.DistributionChannel,
+      @Consumption.hidden: true
+      SalesContractItemPrcgElmnt.OrganizationDivision,
+
+      //Association
+      _Item          : redirected to parent I_SalesContractItemTP,
+      _SalesContract : redirected to I_SalesContractTP
+
+}
+```

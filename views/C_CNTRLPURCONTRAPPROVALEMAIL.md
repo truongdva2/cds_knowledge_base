@@ -1,0 +1,119 @@
+---
+name: C_CNTRLPURCONTRAPPROVALEMAIL
+description: Cntrlpurcontrapprovalemail
+app_component: MM-PUR-HUB-CTR-2CL
+software_component: SAPSCORE
+release_state: released
+clean_core_level: A
+system_type: public_cloud
+source_available: true
+tags:
+  - MM
+  - MM-PUR
+  - MM-PUR-HUB
+  - consumption-view
+  - workflow
+  - email
+  - approval
+  - component:MM-PUR-HUB-CTR-2CL
+  - lob:Sourcing & Procurement
+---
+# C_CNTRLPURCONTRAPPROVALEMAIL
+
+**Cntrlpurcontrapprovalemail**
+
+| Property | Value |
+|---|---|
+| App Component | `MM-PUR-HUB-CTR-2CL` |
+| Software Component | `SAPSCORE` |
+| Release State | Released (Level A) |
+| System Type | S/4HANA Cloud Public Edition |
+
+## Fields
+
+| Field | Data Source |
+|---|---|
+| `key _Workflowtask.WorkflowTaskInternalID` | `_Workflowtask.WorkflowTaskInternalID` |
+| `ebeln )` | `cast(substring(_WorkflowTaskApplObject.TechnicalWrkflwObject, 1 , 10 )` |
+| `_CentralPurchaseContract.PurchaseContractType` | *Association* |
+| `_PurDocType._Text[1:Language=$session.system_language].PurchasingDocumentTypeName` | *Association* |
+| `_CentralPurchaseContract.DocumentCurrency` | *Association* |
+| `sww_lsd )` | `cast(tstmp_to_dats( _Workflowtask.WrkflwTskCreationUTCDateTime, 'UTC', $session.client, 'NULL' )` |
+| `sww_lst )` | `cast(tstmp_to_tims( _Workflowtask.WrkflwTskCreationUTCDateTime, 'UTC', $session.client, 'NULL' )` |
+| `sww_led )` | `cast(tstmp_to_dats( _TaskDueDate.WorkflowTaskDueUTCDateTime, 'UTC', $session.client, 'NULL' )` |
+| `sww_let )` | `cast(tstmp_to_tims( _TaskDueDate.WorkflowTaskDueUTCDateTime, 'UTC', $session.client, 'NULL' )` |
+| `_CentralPurchaseContract.Supplier` | *Association* |
+| `_CentralPurchaseContract.ActivePurchasingDocument                                                             as ActivePurchasingDocument, //3227601` | *Association* |
+| `_User.UserDescription                                                                                         as CreatedByUserDescription` | *Association* |
+| `_Supplier.SupplierName` | *Association* |
+
+## Associations
+
+> No associations found.
+
+## Source Code
+
+```abap
+@AbapCatalog.sqlViewName: 'CNTRLCONTRAPREML'
+@AbapCatalog.compiler.compareFilter: true
+@AbapCatalog.preserveKey: true
+@AccessControl.authorizationCheck: #CHECK
+@AccessControl.personalData.blocking: #NOT_REQUIRED
+@EndUserText.label: 'Cntrl Purchase Contract Details for Workflow Approval Email'
+@VDM.viewType : #CONSUMPTION
+@ClientHandling.algorithm: #SESSION_VARIABLE
+
+@ObjectModel.usageType : {
+  serviceQuality: #C,
+  sizeCategory: #L,
+  dataClass: #TRANSACTIONAL
+}
+@ObjectModel.supportedCapabilities: #OUTPUT_EMAIL_DATA_PROVIDER
+@Metadata.ignorePropagatedAnnotations:true
+
+define view C_CntrlPurContrApprovalEmail
+  as select from            I_WorkflowTask                 as _Workflowtask
+
+    inner join I_WorkflowTaskApplObject       as _WorkflowTaskApplObject  on  _WorkflowTaskApplObject.WorkflowTaskInternalID        = _Workflowtask.WorkflowTaskInternalID
+                                                                                       and _WorkflowTaskApplObject.WorkflowObjectRole            = '01'
+                                                                                       and _WorkflowTaskApplObject.SAPObjectNodeRepresentation   = 'CentralPurchaseContract'
+                                                                                       and _WorkflowTaskApplObject.TechnicalWrkflwObjectCategory = 'CL'
+
+    left outer to one join  I_CentralPurchaseContractAPI01 as _CentralPurchaseContract on _CentralPurchaseContract.CentralPurchaseContract = _WorkflowTaskApplObject.TechnicalWrkflwObject
+
+    left outer to one join  I_PurchasingDocumentType       as _PurDocType              on  _PurDocType.PurchasingDocumentType     = _CentralPurchaseContract.PurchaseContractType
+                                                                                       and _PurDocType.PurchasingDocumentCategory = 'C'
+
+    left outer to one join  I_User                         as _User                    on _User.UserID = _CentralPurchaseContract.CreatedByUser
+    left outer to one join  I_Supplier                     as _Supplier                on _Supplier.Supplier = _CentralPurchaseContract.Supplier
+
+{
+  key _Workflowtask.WorkflowTaskInternalID,
+
+      cast(substring(_WorkflowTaskApplObject.TechnicalWrkflwObject, 1 , 10 ) as ebeln )                             as CentralPurchaseContract,
+
+      _CentralPurchaseContract.PurchaseContractType,
+
+      _PurDocType._Text[1:Language=$session.system_language].PurchasingDocumentTypeName,
+
+      @Semantics.currencyCode: true
+      _CentralPurchaseContract.DocumentCurrency,
+
+      cast(tstmp_to_dats( _Workflowtask.WrkflwTskCreationUTCDateTime, 'UTC', $session.client, 'NULL' ) as sww_lsd ) as CntrlContrWrkflwTskCrtnUTCDte,
+
+      cast(tstmp_to_tims( _Workflowtask.WrkflwTskCreationUTCDateTime, 'UTC', $session.client, 'NULL' ) as sww_lst ) as CntrlContrWrkflwTskCrtnUTCTme,
+
+      cast(tstmp_to_dats( _TaskDueDate.WorkflowTaskDueUTCDateTime, 'UTC', $session.client, 'NULL' ) as sww_led )    as CntrlContrWrkflwTskDuUTCDte,
+
+      cast(tstmp_to_tims( _TaskDueDate.WorkflowTaskDueUTCDateTime, 'UTC', $session.client, 'NULL' ) as sww_let )    as CntrlContrWrkflwTskDuUTCTme,
+
+      _CentralPurchaseContract.Supplier,
+
+      _CentralPurchaseContract.ActivePurchasingDocument                                                             as ActivePurchasingDocument, //3227601
+
+      _User.UserDescription                                                                                         as CreatedByUserDescription,
+
+      _Supplier.SupplierName
+
+}
+```

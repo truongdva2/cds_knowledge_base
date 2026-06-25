@@ -1,0 +1,144 @@
+---
+name: I_REUSBLOBJECTTOCONTRACTASSGMT
+description: Reusblobjecttocontractassgmt
+app_component: RE-FX-BD-2CL
+software_component: SAPSCORE
+release_state: released
+clean_core_level: A
+system_type: public_cloud
+source_available: true
+tags:
+  - RE
+  - RE-FX
+  - RE-FX-BD
+  - interface-view
+  - contract
+  - component:RE-FX-BD-2CL
+  - lob:Other
+---
+# I_REUSBLOBJECTTOCONTRACTASSGMT
+
+**Reusblobjecttocontractassgmt**
+
+| Property | Value |
+|---|---|
+| App Component | `RE-FX-BD-2CL` |
+| Software Component | `SAPSCORE` |
+| Release State | Released (Level A) |
+| System Type | S/4HANA Cloud Public Edition |
+
+## Fields
+
+| Field | Data Source |
+|---|---|
+| `REStatusObjectSource` | `_REObjectAssgmt.REStatusObjectTarget` |
+| `key _REObjectAssgmt.REObjectAssignmentType` | `_REObjectAssgmt.REObjectAssignmentType` |
+| `key _REContract.CompanyCode` | `_REContract.CompanyCode` |
+| `key _REContract.RealEstateContract` | `_REContract.RealEstateContract` |
+| `recadateperiod preserving type )` | `cast(concat(_REUsableObject.ValidityStartDate, _REUsableObject.ValidityEndDate )` |
+| `key _REUsableObject.RealEstateUsableObjectUUID` | `_REUsableObject.RealEstateUsableObjectUUID` |
+| `rebdvdmvalidfrom preserving type )` | `case when _REObjectAssgmt.ValidityStartDate > _REContract.ContractStartDate then cast( coalesce(_REUsableObject.ValidityStartDate, '00000000')` |
+| `when _REObjectAssgmt._REObjectTypeDetails._REUsableObject.ValidityStartDate > _REContract.ContractStartDate then _REObjectAssgmt._REObjectTypeDetails._REUsableObject.ValidityStartDate` | `when _REObjectAssgmt._REObjectTypeDetails._REUsableObject.ValidityStartDate > _REContract.ContractStartDate then _REObjectAssgmt._REObjectTypeDetails._REUsableObject.ValidityStartDate` |
+| `else _REContract.ContractStartDate` | `else _REContract.ContractStartDate` |
+| `ValidityStartDate` | `end` |
+| `_REObjectAssgmt.REStatusObjectSource                                                                as REStatusObjectTarget` | *Association* |
+| `rebdvdmvalidto preserving type )` | `case when _REObjectAssgmt.ValidityEndDate < _REContract.ContractEndDate then cast( coalesce(_REUsableObject.ValidityEndDate, '99991231')` |
+| `when _REObjectAssgmt._REObjectTypeDetails._REUsableObject.ValidityEndDate < _REContract.ContractEndDate then _REObjectAssgmt._REObjectTypeDetails._REUsableObject.ValidityEndDate` | `when _REObjectAssgmt._REObjectTypeDetails._REUsableObject.ValidityEndDate < _REContract.ContractEndDate then _REObjectAssgmt._REObjectTypeDetails._REUsableObject.ValidityEndDate` |
+| `else _REContract.ContractEndDate` | `else _REContract.ContractEndDate` |
+| `ValidityEndDate` | `end` |
+| `_REObjectAssgmt.REOnlyInfoAssgmt` | *Association* |
+| `_REObjectAssgmt.REStatusObjectSourceIsArchived` | *Association* |
+| `_REObjectAssgmt.REGenerationType` | *Association* |
+| `_REObjectAssgmt.REIsMainAsset` | *Association* |
+| `_REObjectAssgmt.REAssignmentHasMultiple` | *Association* |
+| `_REObjectAssgmt.REObjectPossessionStartDate` | *Association* |
+| `_REObjectAssgmt.REObjectPossessionEndDate` | *Association* |
+| `_REObjectAssgmt._REObjectTypeDetails` | *Association* |
+| `_REObjectAssgmt._REObjectAssignmentType` | *Association* |
+| `_REObjectAssgmt._REGenerationType` | *Association* |
+| `_REContract._CompanyCode` | *Association* |
+| `_REContract` | *Association* |
+| `_REUsableObjectData` | *Association* |
+
+## Associations
+
+| Alias | Target View | Cardinality |
+|---|---|---|
+| `_REContract` | `I_REContract` | [1..1] |
+| `_REUsableObjectData` | `I_REUsableObject` | [1..1] |
+
+## Source Code
+
+```abap
+@AccessControl.authorizationCheck: #MANDATORY
+@EndUserText.label: 'RE Usable Object Contract Assignment'
+@Analytics:{
+  internalName: #LOCAL,
+  dataExtraction.enabled: true,
+  technicalName: 'IREUOTOCN'
+}
+@ObjectModel: {
+  usageType: {
+    dataClass: #MASTER,
+    serviceQuality: #C,
+    sizeCategory: #L
+  },
+  modelingPattern: #NONE,
+  supportedCapabilities: [
+    #CDS_MODELING_ASSOCIATION_TARGET,
+    #SQL_DATA_SOURCE,
+    #EXTRACTION_DATA_SOURCE,
+    #CDS_MODELING_DATA_SOURCE
+  ],
+  sapObjectNodeType.name: 'REUsblObjToContractAssignment'
+}
+@Metadata.ignorePropagatedAnnotations: true
+@VDM.viewType: #COMPOSITE
+
+define view entity I_REUsblObjectToContractAssgmt
+  as select from I_REObjectAssgmt as _REObjectAssgmt
+    inner join   I_REUsableObject as _REUsableObject on _REObjectAssgmt.REStatusObjectTarget = _REUsableObject.REStatusObject
+    
+  association [1..1] to I_REContract as _REContract on $projection.REStatusObjectTarget = _REContract.REStatusObject
+  association [1..1] to I_REUsableObject as _REUsableObjectData on $projection.REStatusObjectSource = _REUsableObjectData.REStatusObject
+
+{
+  key _REObjectAssgmt.REStatusObjectTarget                                                                as REStatusObjectSource,
+  @ObjectModel.foreignKey.association: '_REObjectAssignmentType'
+  key _REObjectAssgmt.REObjectAssignmentType,
+  key _REContract.CompanyCode,
+  key _REContract.RealEstateContract,
+  key cast(concat(_REUsableObject.ValidityStartDate, _REUsableObject.ValidityEndDate ) as recadateperiod preserving type ) as ValidityStartEndDateValue,
+  key _REUsableObject.RealEstateUsableObjectUUID,
+      @Semantics.businessDate.from: true
+      case when _REObjectAssgmt.ValidityStartDate > _REContract.ContractStartDate then cast( coalesce(_REUsableObject.ValidityStartDate, '00000000') as rebdvdmvalidfrom preserving type )
+           when _REObjectAssgmt._REObjectTypeDetails._REUsableObject.ValidityStartDate > _REContract.ContractStartDate then _REObjectAssgmt._REObjectTypeDetails._REUsableObject.ValidityStartDate
+           else _REContract.ContractStartDate
+      end                                                                                                 as ValidityStartDate,
+      _REObjectAssgmt.REStatusObjectSource                                                                as REStatusObjectTarget,
+
+      @Semantics.businessDate.to: true
+      case when _REObjectAssgmt.ValidityEndDate < _REContract.ContractEndDate then cast( coalesce(_REUsableObject.ValidityEndDate, '99991231') as rebdvdmvalidto preserving type )
+           when _REObjectAssgmt._REObjectTypeDetails._REUsableObject.ValidityEndDate < _REContract.ContractEndDate then _REObjectAssgmt._REObjectTypeDetails._REUsableObject.ValidityEndDate
+           else _REContract.ContractEndDate
+      end                                                                                                 as ValidityEndDate,
+      _REObjectAssgmt.REOnlyInfoAssgmt,
+      _REObjectAssgmt.REStatusObjectSourceIsArchived,
+      _REObjectAssgmt.REGenerationType,
+      _REObjectAssgmt.REIsMainAsset,
+      _REObjectAssgmt.REAssignmentHasMultiple,
+      _REObjectAssgmt.REObjectPossessionStartDate,
+      _REObjectAssgmt.REObjectPossessionEndDate,
+
+      _REObjectAssgmt._REObjectTypeDetails,
+      _REObjectAssgmt._REObjectAssignmentType,
+      _REObjectAssgmt._REGenerationType,
+      _REContract._CompanyCode,
+      _REContract,
+      _REUsableObjectData
+
+}
+where
+      _REObjectAssgmt.REStatusObjectTarget like 'J7%'
+  and _REObjectAssgmt.REStatusObjectSource like 'IS%'
+```

@@ -1,0 +1,125 @@
+---
+name: I_BR_SIMPLESSUPPLIERTAXRATE
+description: BR Simplessuppliertaxrate
+app_component: FI-LOC-LO-BR
+software_component: SAPSCORE
+release_state: released
+clean_core_level: A
+system_type: public_cloud
+source_available: true
+tags:
+  - FI
+  - FI-LOC
+  - FI-LOC-LO
+  - interface-view
+  - supplier
+  - tax
+  - component:FI-LOC-LO-BR
+  - lob:Finance
+  - bo:Supplier
+---
+# I_BR_SIMPLESSUPPLIERTAXRATE
+
+**BR Simplessuppliertaxrate**
+
+| Property | Value |
+|---|---|
+| App Component | `FI-LOC-LO-BR` |
+| Software Component | `SAPSCORE` |
+| Release State | Released (Level A) |
+| System Type | S/4HANA Cloud Public Edition |
+
+## Fields
+
+| Field | Data Source |
+|---|---|
+| `Supplier` | `supplier` |
+| `FiscalYear` | `fiscal_year` |
+| `FiscalMonth` | `fiscal_month` |
+| `BR_SIMPLESClassCode` | `class` |
+| `BR_SIMPLESTaxRate` | `rate` |
+| `_Supplier.AuthorizationGroup   as AuthorizationGroup` | *Association* |
+| `_Supplier.SupplierAccountGroup as SupplierAccountGroup` | *Association* |
+| `_Supplier.DataControllerSet` | *Association* |
+| `_Supplier.DataController1` | *Association* |
+| `_Supplier.DataController2` | *Association* |
+| `_Supplier.DataController3` | *Association* |
+| `_Supplier.DataController4` | *Association* |
+| `_Supplier.DataController5` | *Association* |
+| `_Supplier.DataController6` | *Association* |
+| `_Supplier.DataController7` | *Association* |
+| `_Supplier.DataController8` | *Association* |
+| `_Supplier.DataController9` | *Association* |
+| `_Supplier.DataController10` | *Association* |
+
+## Associations
+
+| Alias | Target View | Cardinality |
+|---|---|---|
+| `_Supplier` | `I_Supplier` | [1..1] |
+
+## Source Code
+
+```abap
+@AbapCatalog.sqlViewName: 'IBRSIMPLESSUPTAX'
+@AbapCatalog.compiler.compareFilter: true
+@AccessControl.personalData.blocking: #REQUIRED
+@AccessControl.authorizationCheck: #MANDATORY
+@EndUserText.label: 'Brazil Simples Nac Supplier Tax Rate'
+@VDM.viewType: #BASIC
+@ObjectModel.supportedCapabilities: [#SQL_DATA_SOURCE,#CDS_MODELING_DATA_SOURCE]
+@ObjectModel.modelingPattern: #NONE
+@ObjectModel.usageType.dataClass: #TRANSACTIONAL
+@ObjectModel.usageType.serviceQuality: #C
+@ObjectModel.usageType.sizeCategory: #XL
+@ClientHandling.algorithm: #SESSION_VARIABLE
+@Metadata.ignorePropagatedAnnotations: true
+@Consumption.dbHints: [ 'USE_HEX_PLAN' ]
+
+define view I_BR_SIMPLESSupplierTaxRate
+  as select from logbr_mm_simples
+  association [1..1] to I_Supplier as _Supplier on _Supplier.Supplier = $projection.Supplier
+{
+  key supplier                       as Supplier,
+  key fiscal_year                    as FiscalYear,
+  key fiscal_month                   as FiscalMonth,
+  key class                          as BR_SIMPLESClassCode,
+      rate                           as BR_SIMPLESTaxRate,
+      _Supplier.AuthorizationGroup   as AuthorizationGroup,
+      _Supplier.SupplierAccountGroup as SupplierAccountGroup,
+      
+      @UI.hidden: true
+      @Consumption.hidden: true
+      _Supplier.DataControllerSet,
+      @UI.hidden: true
+      @Consumption.hidden: true
+      _Supplier.DataController1,
+      @UI.hidden: true
+      @Consumption.hidden: true
+      _Supplier.DataController2,
+      @UI.hidden: true
+      @Consumption.hidden: true
+      _Supplier.DataController3,
+      @UI.hidden: true
+      @Consumption.hidden: true
+      _Supplier.DataController4,
+      @UI.hidden: true
+      @Consumption.hidden: true
+      _Supplier.DataController5,
+      @UI.hidden: true
+      @Consumption.hidden: true
+      _Supplier.DataController6,
+      @UI.hidden: true
+      @Consumption.hidden: true
+      _Supplier.DataController7,
+      @UI.hidden: true
+      @Consumption.hidden: true
+      _Supplier.DataController8,
+      @UI.hidden: true
+      @Consumption.hidden: true
+      _Supplier.DataController9,
+      @UI.hidden: true
+      @Consumption.hidden: true
+      _Supplier.DataController10
+}
+```

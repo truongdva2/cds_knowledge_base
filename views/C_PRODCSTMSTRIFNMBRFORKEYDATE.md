@@ -1,0 +1,115 @@
+---
+name: C_PRODCSTMSTRIFNMBRFORKEYDATE
+description: Prodcstmstrifnmbrforkeydate
+app_component: FT-ITR-CLS
+software_component: SAPSCORE
+release_state: released
+clean_core_level: A
+system_type: public_cloud
+source_available: true
+tags:
+  - FT
+  - FT-ITR
+  - FT-ITR-CLS
+  - consumption-view
+  - component:FT-ITR-CLS
+  - lob:Other
+---
+# C_PRODCSTMSTRIFNMBRFORKEYDATE
+
+**Prodcstmstrifnmbrforkeydate**
+
+| Property | Value |
+|---|---|
+| App Component | `FT-ITR-CLS` |
+| Software Component | `SAPSCORE` |
+| Release State | Released (Level A) |
+| System Type | S/4HANA Cloud Public Edition |
+
+## Fields
+
+| Field | Data Source |
+|---|---|
+| `key Class.TrdClassfctnNmbrSchm` | `Class.TrdClassfctnNmbrSchm` |
+| `key Class.TrdClassfctnNmbrSchmCntnt` | `Class.TrdClassfctnNmbrSchmCntnt` |
+| `key Class.Product` | `Class.Product` |
+| `key Class.ValidityStartDate` | `Class.ValidityStartDate` |
+| `Class.ValidityEndDate` | `Class.ValidityEndDate` |
+| `/sapsll/tarno)` | `cast (_CustomsTariffNumber.TrdClassfctnNmbr` |
+| `_TrdClassfctnNmbrSchmUsge.Country` | *Association* |
+| `_CustomsTariffNumber.CustomsUnitOfMeasure` | *Association* |
+| `_CustomsTariffNumber.UnitOfMeasureSystem` | *Association* |
+| `_CustomsTariffNumber.SecondCustomsUnitOfMeasure` | *Association* |
+| `_CustomsTariffNumber.SupplementaryUnit` | *Association* |
+| `_TrdClassfctnNmbrSchm` | *Association* |
+| `_Product` | *Association* |
+| `_CustomsTariffNumber._CustomsUnitOfMeasure` | *Association* |
+| `_CustomsTariffNumber._SecondCustomsUnitOfMeasure` | *Association* |
+| `_Text` | *Association* |
+| `_CustomsTariffNumber._SupplementaryUnit` | *Association* |
+
+## Associations
+
+| Alias | Target View | Cardinality |
+|---|---|---|
+| `_CustomsTariffNumber` | `I_TrdClassfctnNmbr` | [0..1] |
+| `_Text` | `I_TrdClassfctnNmbrText` | [0..*] |
+| `_TrdClassfctnNmbrSchmUsge` | `I_TrdClassfctnNmbrSchmUsge` | [0..1] |
+
+## Source Code
+
+```abap
+@EndUserText.label: 'Product Tariff Number Classification for Key Date'
+@VDM.viewType: #CONSUMPTION
+@AbapCatalog.sqlViewName: 'CPRTRIFNOFKDATE'
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@ClientHandling.algorithm: #SESSION_VARIABLE
+@Metadata.ignorePropagatedAnnotations:true
+
+@ObjectModel.usageType.sizeCategory: 'L'
+@ObjectModel.usageType.serviceQuality: #C
+@ObjectModel.usageType.dataClass: #MIXED
+
+@ObjectModel.modelingPattern:#NONE
+
+@ObjectModel.supportedCapabilities:  [  #CDS_MODELING_DATA_SOURCE,
+                                        #CDS_MODELING_ASSOCIATION_TARGET,
+                                        #SQL_DATA_SOURCE                   ]
+define view C_ProdCstmsTrifNmbrForKeyDate
+  with parameters
+    P_KeyDate : sll_validon
+    as select from           C_ProductTrdClassfctn (P_KeyDate : $parameters.P_KeyDate) as Class
+    association [0..1]      to        I_TrdClassfctnNmbr                     as _CustomsTariffNumber      on  _CustomsTariffNumber.TrdClassfctnNmbr          =  Class.TrdClassfctnNmbr
+                                                                             and _CustomsTariffNumber.TrdClassfctnNmbrSchmCntnt =  Class.TrdClassfctnNmbrSchmCntnt
+    association [0..*]      to        I_TrdClassfctnNmbrText as _Text        on  _Text.TrdClassfctnNmbrSchmCntnt = $projection.TrdClassfctnNmbrSchmCntnt
+                                                                             and _Text.TrdClassfctnNmbr          = $projection.CustomsTariffNumber
+                                                                             and _Text.TrdClassfctnNmbrTextType  = 'A'
+                                                                             and _Text.ValidityStartDate         = $projection.ValidityStartDate
+    association [0..1]      to        I_TrdClassfctnNmbrSchmUsge             as _TrdClassfctnNmbrSchmUsge on _TrdClassfctnNmbrSchmUsge.TrdClassfctnNmbrSchm = Class.TrdClassfctnNmbrSchm
+                                                                                                                                                                                                                              
+{
+  key Class.TrdClassfctnNmbrSchm,
+  key Class.TrdClassfctnNmbrSchmCntnt,
+  key Class.Product,
+  key Class.ValidityStartDate,
+      Class.ValidityEndDate,
+      @ObjectModel.text.association: '_Text'
+      cast (_CustomsTariffNumber.TrdClassfctnNmbr as /sapsll/tarno) as CustomsTariffNumber,
+      _TrdClassfctnNmbrSchmUsge.Country,
+      _CustomsTariffNumber.CustomsUnitOfMeasure,
+      _CustomsTariffNumber.UnitOfMeasureSystem,
+      _CustomsTariffNumber.SecondCustomsUnitOfMeasure,
+      _CustomsTariffNumber.SupplementaryUnit,
+
+      _TrdClassfctnNmbrSchm,
+      _Product,
+      _CustomsTariffNumber._CustomsUnitOfMeasure,
+      _CustomsTariffNumber._SecondCustomsUnitOfMeasure,
+      _Text,
+      _CustomsTariffNumber._SupplementaryUnit
+}
+where
+      Class.TrdClassfctnNmbrSchmType = '04'
+  and _CustomsTariffNumber.ValidityStartDate <= Class.ValidityStartDate
+  and _CustomsTariffNumber.ValidityEndDate >= Class.ValidityEndDate
+```

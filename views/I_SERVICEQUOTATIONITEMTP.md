@@ -1,0 +1,178 @@
+---
+name: I_SERVICEQUOTATIONITEMTP
+description: Servicequotationitemtp
+app_component: CRM-S4-SRV-SVQ-2CL
+software_component: SAPSCORE
+release_state: released
+clean_core_level: A
+system_type: public_cloud
+source_available: true
+tags:
+  - CRM
+  - interface-view
+  - transactional-processing
+  - service
+  - item-level
+  - component:CRM-S4-SRV-SVQ-2CL
+  - lob:Other
+---
+# I_SERVICEQUOTATIONITEMTP
+
+**Servicequotationitemtp**
+
+| Property | Value |
+|---|---|
+| App Component | `CRM-S4-SRV-SVQ-2CL` |
+| Software Component | `SAPSCORE` |
+| Release State | Released (Level A) |
+| System Type | S/4HANA Cloud Public Edition |
+
+## Fields
+
+| Field | Data Source |
+|---|---|
+| `currencyCode: 'TransactionCurrency'} }` | `currencyCode: 'TransactionCurrency'} }` |
+| `ServiceDocumentItemTaxAmount` | `ServiceDocumentItemTaxAmount` |
+| `ServiceQtanItemExtReference` | `ServiceQtanItemExtReference` |
+| `ServiceQtanExtReference` | `ServiceQtanExtReference` |
+| `ReferenceServiceContract` | `ReferenceServiceContract` |
+| `ReferenceServiceContractItem` | `ReferenceServiceContractItem` |
+| `/* Associations */` | `/* Associations */` |
+| `_ServiceDocument` | *Association* |
+| `_ServicePerformer` | *Association* |
+| `_Product` | *Association* |
+| `_ContactPerson` | *Association* |
+| `_RespEmployee` | *Association* |
+| `_ServiceObjType` | *Association* |
+| `_SrvcQtanItmStatus` | *Association* |
+| `_TransactionCurrency` | *Association* |
+| `_ServiceQuotationTP         : redirected to parent I_ServiceQuotationTP` | *Association* |
+| `/* Compositions */` | `/* Compositions */` |
+| `_SrvcQtanItemRefObjectTP    : redirected to composition child I_SrvcQtanItemRefObjectTP` | *Association* |
+| `_SrvcQtanItemPriceElementTP : redirected to composition child I_SrvcQtanItemPriceElementTP` | *Association* |
+| `_SrvcQtanItemAppointmentTP  : redirected to composition child I_SrvcQtanItemAppointmentTP` | *Association* |
+| `_SrvcQtanItemDurationTP     : redirected to composition child I_SrvcQtanItemDurationTP` | *Association* |
+| `_SrvcQtanItmFUPSrvcOrdTP    : redirected to composition child I_SrvcQtanItmFUPSrvcOrdTP` | *Association* |
+| `_SrvcQtanItemLongTextTP     : redirected to composition child I_SrvcQtanItemLongTextTP` | *Association* |
+| `_SrvcQtanItemPartnerTP      : redirected to composition child I_SrvcQtanItemPartnerTP` | *Association* |
+
+## Associations
+
+> No associations found.
+
+## Source Code
+
+```abap
+@AccessControl: {
+  authorizationCheck: #CHECK,
+  personalData.blocking: #('TRANSACTIONAL_DATA')
+}
+@EndUserText.label: 'Service Quotation Item - TP'
+@VDM: {
+  viewType: #TRANSACTIONAL,
+  lifecycle.contract.type: #PUBLIC_LOCAL_API
+}
+@ObjectModel: {
+   representativeKey: 'ServiceQuotationItem',
+    usageType: {dataClass:      #TRANSACTIONAL,
+                serviceQuality: #C,
+                sizeCategory:   #L},
+    modelingPattern:        #TRANSACTIONAL_INTERFACE,
+    supportedCapabilities: [#TRANSACTIONAL_PROVIDER]              
+}
+
+@Metadata.ignorePropagatedAnnotations: true
+
+define view entity I_ServiceQuotationItemTP 
+  as projection on R_ServiceQuotationItemTP as _ServiceQuotationItemTP
+{
+      //Administrative fields
+      @ObjectModel.foreignKey.association: '_ServiceDocument'
+  key ServiceQuotation,
+  key ServiceQuotationItem,
+      @ObjectModel.foreignKey.association: '_ServiceObjType'
+      ServiceObjectType,
+      ServiceDocumentItemObjectType,
+      ServiceQtanItemCategory,
+      ServiceQuotationItemUUID,
+      ParentServiceQuotationItem,
+      ServiceQtanItemDescription,
+      Language,
+
+      ServiceDocItemCreationDateTime,
+      ServiceDocItemChangedDateTime,
+      ServiceDocItemCreatedByUser,
+      ServiceDocItemChangedByUser,
+
+      //Item fields
+      @ObjectModel.foreignKey.association: '_Product'
+      Product,
+      @Semantics.quantity.unitOfMeasure: 'QuantityUnit'
+      Quantity,
+      QuantityUnit,
+
+      //Partners
+      SoldToParty,
+      ShipToParty,
+      @ObjectModel.foreignKey.association: '_ContactPerson'
+      ContactPersonBusinessPartnerId,
+      @ObjectModel.foreignKey.association: '_RespEmployee'
+      RespEmployeeBusinessPartnerId,
+      ServicePerformer,
+
+      //Organizational data
+      RespyMgmtServiceTeam,
+      RespyMgmtGlobalTeamID,
+
+      //Status
+      ServiceQuotationItemIsNew,
+      SrvcQtanItemIsInProcess,
+      ServiceQuotationItemIsReleased,
+      ServiceQtanItemIsCompleted,
+      SrvcQtanItemStatus,
+      @Semantics.booleanIndicator
+      ServiceQuotationItemIsRejected,
+      @Semantics.booleanIndicator
+      ServiceQuotationItemIsAccepted,
+      @Semantics.booleanIndicator
+      ServiceQuotationItemHasError,
+
+      //Pricing fields
+      @ObjectModel.foreignKey.association: '_TransactionCurrency'
+      TransactionCurrency,
+      @Semantics: { amount : {currencyCode: 'TransactionCurrency'} }
+      ServiceDocItemGrossAmount,
+      @Semantics: { amount : {currencyCode: 'TransactionCurrency'} }
+      ServiceDocumentItemNetAmount,
+      @Semantics: { amount : {currencyCode: 'TransactionCurrency'} }
+      ServiceDocumentItemTaxAmount,
+
+      //Reference documents
+      ServiceQtanItemExtReference,
+      ServiceQtanExtReference,
+      ReferenceServiceContract,
+      ReferenceServiceContractItem,
+
+      /* Associations */
+      _ServiceDocument,
+      _ServicePerformer,
+      _Product,
+      _ContactPerson,
+      _RespEmployee,
+      _ServiceObjType,
+      _SrvcQtanItmStatus,
+      _TransactionCurrency,
+
+      _ServiceQuotationTP         : redirected to parent I_ServiceQuotationTP,
+
+      /* Compositions */
+      _SrvcQtanItemRefObjectTP    : redirected to composition child I_SrvcQtanItemRefObjectTP,
+      _SrvcQtanItemPriceElementTP : redirected to composition child I_SrvcQtanItemPriceElementTP,
+      //_SrvcQtanItemUserStatusTP   : redirected to composition child I_SrvcQtanItemUserStatusTP, //User Status Feature not enabled
+      _SrvcQtanItemAppointmentTP  : redirected to composition child I_SrvcQtanItemAppointmentTP,
+      _SrvcQtanItemDurationTP     : redirected to composition child I_SrvcQtanItemDurationTP,
+      _SrvcQtanItmFUPSrvcOrdTP    : redirected to composition child I_SrvcQtanItmFUPSrvcOrdTP,
+      _SrvcQtanItemLongTextTP     : redirected to composition child I_SrvcQtanItemLongTextTP,
+      _SrvcQtanItemPartnerTP      : redirected to composition child I_SrvcQtanItemPartnerTP
+}
+```
